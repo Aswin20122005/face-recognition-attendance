@@ -189,4 +189,3 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return service.student_summary(db, class_name)
 
     return app
-
