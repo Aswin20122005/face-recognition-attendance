@@ -31,7 +31,8 @@ def run_live(db, session_id, detector, recognizer, camera=0, confirm_frames=5, s
     """Run until 'q' is pressed (or max_frames). Returns the roll numbers marked present."""
     names = {s.roll_no: s.name for s in service.list_students(db)}
     tracker = ConfirmationTracker(required=confirm_frames)
-    marked = {r.student.roll_no for r in service.get_session(db, session_id).records}
+    marked = {row["roll_no"] for row in service.session_report(db, session_id)["students"]
+              if row["status"] == "present"}
     tracker.confirmed |= marked  # already present (e.g. after a restart) won't be re-confirmed
     cap = capture or cv2.VideoCapture(camera)
     frames = 0

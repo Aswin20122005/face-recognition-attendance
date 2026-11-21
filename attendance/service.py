@@ -109,7 +109,10 @@ def mark_present(db: Session, session_id: int, roll_no: str, method: str = "face
 def session_report(db: Session, session_id: int) -> dict:
     """Present and absent students for one session (absent = in the class, not marked)."""
     session = get_session(db, session_id)
-    marked = {r.student_id: r for r in session.records}
+    # Query the records instead of using session.records: that relationship may
+    # already be loaded (and stale) if this ClassSession object was fetched earlier.
+    marked = {r.student_id: r for r in db.scalars(
+        select(AttendanceRecord).where(AttendanceRecord.session_id == session_id))}
     roster = list_students(db, session.class_name)
     rows = []
     for s in roster:
