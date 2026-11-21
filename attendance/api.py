@@ -1,6 +1,6 @@
 """REST API for attendance records, enrollment and reporting.
 
-    uvicorn attendance.api:app --reload
+    uvicorn attendance.api:create_app --factory --reload
     open http://127.0.0.1:8000/docs
 """
 
@@ -13,7 +13,7 @@ import os
 import cv2
 import numpy as np
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 from attendance import service
@@ -85,12 +85,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(service.NotFound)
     async def not_found(_, exc):
-        from fastapi.responses import JSONResponse
         return JSONResponse(status_code=404, content={"detail": str(exc)})
 
     @app.exception_handler(service.Conflict)
     async def conflict(_, exc):
-        from fastapi.responses import JSONResponse
         return JSONResponse(status_code=409, content={"detail": str(exc)})
 
     @app.get("/health")
@@ -192,5 +190,3 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     return app
 
-
-app = create_app() if os.environ.get("ATTENDANCE_NO_AUTOAPP") != "1" else None
