@@ -1,7 +1,8 @@
 # Runtime data: face images, trained model and database stay local
+# (the model is written inside /data/, so no global *.yml rule: that would also
+# hide docker-compose.yml and the GitHub Actions workflows)
 /data/
 *.db
-*.yml
 
 # Python
 __pycache__/

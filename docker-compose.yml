@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - attendance-data:/data   # faces, trained model and SQLite database
+    environment:
+      MATCH_THRESHOLD: "70"
+    restart: unless-stopped
+
+volumes:
+  attendance-data:
