@@ -46,3 +46,34 @@ def test_process_frame_recognises_and_confirms():
     assert [r.roll_no for r in first] == ["R1", None]
     assert [r.confirmed for r in first] == [False, False]
     assert [r.confirmed for r in second] == [True, False]
+
+
+class FakeCapture:
+    def __init__(self, n):
+        self.n = n
+
+    def read(self):
+        if self.n == 0:
+            return False, None
+        self.n -= 1
+        return True, object()
+
+    def release(self):
+        pass
+
+
+def test_run_live_marks_confirmed_students_once(db):
+    from attendance import service
+    from attendance.live import run_live
+
+    service.add_student(db, "R1", "Asha", "CSE-A")
+    service.add_student(db, "R2", "Ravi", "CSE-A")
+    session = service.start_session(db, "CSE-A")
+    rec = FaceRecognizer(threshold=40)
+    rec.train({"R1": [identity_face(1, k) for k in range(4)], "R2": [identity_face(2, k) for k in range(4)]})
+    detector = FakeDetector([identity_face(1, 30)])
+
+    marked = run_live(db, session.id, detector, rec, confirm_frames=3, show=False, capture=FakeCapture(10))
+    assert marked == {"R1"}
+    report = service.session_report(db, session.id)
+    assert report["present"] == 1 and report["absent"] == 1
