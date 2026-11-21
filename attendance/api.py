@@ -13,7 +13,8 @@ import os
 import cv2
 import numpy as np
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from attendance import service
@@ -23,6 +24,7 @@ from attendance.enroll import enroll_image, sample_counts, train_from_disk
 from attendance.face import FaceDetector, FaceRecognizer
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 
 class StudentIn(BaseModel):
@@ -90,6 +92,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(service.Conflict)
     async def conflict(_, exc):
         return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def dashboard():
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
     @app.get("/health")
     def health():

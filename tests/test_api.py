@@ -95,3 +95,9 @@ def test_full_flow_enroll_train_recognize_report(client):
 
 def test_unknown_session_is_404(client):
     assert client.get("/sessions/999/report").status_code == 404
+
+
+def test_dashboard_is_served(client):
+    r = client.get("/")
+    assert r.status_code == 200 and "session-form" in r.text
+    assert client.get("/static/app.js").status_code == 200

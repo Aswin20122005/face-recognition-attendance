@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Face Recognition Attendance</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header><h1>📸 Attendance</h1><span id="model-status"></span></header>
+  <main>
+    <section class="card">
+      <h2>1. Start a session</h2>
+      <form id="session-form">
+        <input name="class_name" placeholder="Class, e.g. CSE-A" required />
+        <input name="subject" placeholder="Subject (optional)" />
+        <button>Start</button>
+      </form>
+      <p id="session-info" class="muted">No active session.</p>
+    </section>
+
+    <section class="card">
+      <h2>2. Take attendance from a photo</h2>
+      <form id="photo-form">
+        <input type="file" name="file" accept="image/*" capture="environment" required />
+        <button>Recognise</button>
+      </form>
+      <p id="photo-result" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>3. Report</h2>
+      <div class="row">
+        <span id="counts"></span>
+        <a id="csv-link" class="button" hidden>Download CSV</a>
+        <button id="end-btn" hidden>End session</button>
+      </div>
+      <table>
+        <thead><tr><th>Roll no</th><th>Name</th><th>Status</th><th>Method</th><th></th></tr></thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
